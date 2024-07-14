@@ -2,8 +2,11 @@ const User = require("../models/user");
 const { check, validationResult } = require("express-validator");
 var jwt = require("jsonwebtoken");
 var expressJwt = require("express-jwt");
+const sendEmail = require('../transporter');
 
-exports.signup = (req, res) => {
+exports.signup = async (req, res) => {
+  const { email, ...otherSignupData } = req.body;
+
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(422).json({
@@ -18,12 +21,19 @@ exports.signup = (req, res) => {
         err: "NOT able to save user in DB",
       });
     }
+
+    else{
     res.json({
       name: user.name,
       email: user.email,
       id: user._id,
     });
+
+  }
+
   });
+  await sendEmail(email, 'Welcome to Your New Account!', `Thank you for signing up! Your email address is ${email}.`, `<b>Thank you for signing up!</b><br>Your email address is ${email}.`); // Customize email content
+
 };
 
 exports.signin = (req, res) => {

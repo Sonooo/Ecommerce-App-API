@@ -1,5 +1,7 @@
-const nodemailer = require('nodemailer');
 
+const nodemailer = require('nodemailer');
+const fs = require('fs');
+const path = require('path');
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -8,14 +10,16 @@ const transporter = nodemailer.createTransport({
     }
   });
 
+
+  // const emailTemplate = fs.readFileSync(path.join(__dirname, 'welcome-email.html'), 'utf-8');
+ 
   // Define a function to send an email
-async function sendEmail(email, subject, text, html) {
+async function sendEmail(email, subject, html) {
     try {
       await transporter.sendMail({
         from: process.env.GMAIL,
         to: email,
         subject: subject,
-        text: text,
         html: html // Optional HTML content
       });
     } catch (error) {

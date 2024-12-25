@@ -1,8 +1,12 @@
 const User = require("../models/user");
+const emailTemplate= require("../transporter")
 const { check, validationResult } = require("express-validator");
 var jwt = require("jsonwebtoken");
 var expressJwt = require("express-jwt");
 const sendEmail = require('../transporter');
+const fs = require('fs');
+const path = require('path');
+
 
 exports.signup = async (req, res) => {
   const { email, ...otherSignupData } = req.body;
@@ -32,7 +36,14 @@ exports.signup = async (req, res) => {
   }
 
   });
-  await sendEmail(email, 'Welcome to Your New Account!', `Thank you for signing up! Your email address is ${email}.`, `<b>Thank you for signing up!</b><br>Your email address is ${email}.`); // Customize email content
+  
+  const emailTemplate = fs.readFileSync(path.join(__dirname, 'welcome-email.html'), 'utf-8');
+  const personalizedTemplate = emailTemplate
+        .replace('[User\'s Name]', email)
+        .replace('[Your App Name]', 'Mydigitalgarage');
+
+  
+  await sendEmail(email, "Welcome to Your New Account!", personalizedTemplate); // Customize email content
 
 };
 
